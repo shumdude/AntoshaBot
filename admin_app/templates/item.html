@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fast API</title>
+</head>
+<body>
+<table>
+    <tr>
+        <td>Название</td>
+        <td>Стоимость</td>
+        <td>Сайт</td>
+        <td>Фото</td>
+    </tr>
+{% for j in catalog %}
+    <tr>
+        <td>{{j[0]}}</td>
+        <td>{{j[1]}}</td>
+        <td>{{j[2]}}</td>
+        <td>{{j[3]}}</td>
+    </tr>
+{% endfor %}
+</table>
+</body>
+</html>
