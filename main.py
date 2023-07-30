@@ -2,6 +2,7 @@ import asyncio
 import logging
 import asyncpg
 from aiogram.fsm.storage.memory import MemoryStorage
+from tortoise import Tortoise
 import handlers
 from aiogram import Bot, Dispatcher
 from config import Config, load_config
@@ -42,10 +43,25 @@ async def start():
     scheduler.start()
     dp.update.middleware.register(ApschedulerMiddleware(scheduler))
 
+    # Tortoise-ORM
+    await Tortoise.init(config={
+        'connections': {'default': config.db_url()},
+        'apps': {
+            'app': {
+                'models': ['database.models'],
+                'default_connection': 'default'
+            },
+        },
+    })
+    await Tortoise.generate_schemas()
+    logger.info("Tortoise inited!")
+
     # Вносим роутеры в диспетчер
+    logger.info("Register handlers...")
     dp.include_router(handlers.base_handlers_router)
     dp.include_router(handlers.catalog_router)
     dp.include_router(handlers.remind_router)
+    dp.include_router(handlers.booking_router)
 
     # Start polling
     try:

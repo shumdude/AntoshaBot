@@ -22,7 +22,8 @@ class Config:
     db: DatabaseConfig
 
     def db_url(self) -> str:
-        return f"postgresql://%{self.db.db_user}s:%{self.db.db_password}s@%{self.db.db_host}s:5432/%{self.db.database}s"
+        # return f"asyncpg://%{self.db.db_user}s:%{self.db.db_password}s@%{self.db.db_host}s:5432/%{self.db.database}s"
+        return f"asyncpg://{self.db.db_user}:{self.db.db_password}@{self.db.db_host}:5432/{self.db.database}"
 
 
 def load_config(path: str | None) -> Config:
