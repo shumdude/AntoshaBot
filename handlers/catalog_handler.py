@@ -5,27 +5,26 @@ from aiogram.exceptions import TelegramNetworkError, TelegramBadRequest
 from settings import NO_PHOTO
 from settings import LEXICON, get_product_caption
 from keyboards import catalog_kb
-from database import Request
+from database import DBRequest, Product
 
 catalog_router: Router = Router()  # Инициализируем роутер уровня модуля
 
 
 # Выгрузить из БД каталог товаров
 @catalog_router.message(Command(commands='get'))
-async def process_get_command(message: Message, request: Request):
+async def process_get_command(message: Message, request: DBRequest):
     await message.answer(text=LEXICON['/get'])
     catalog_list = await request.get_catalog()
-    for el in catalog_list:
-        text = ', '.join([str(x) for x in el])
+    for product in catalog_list:
+        text = f"{product.name}, {product.price}, {product.url}, {product.photo}"
         await message.answer(text=text)
 
 
 # В будущем реализовать хранение всех фотографий каталога в формате telegram_photo_id, т.к. URL - затратно по времени
-async def catalog_process(callback: CallbackQuery, product):
-    photo_url = product[3]
+async def catalog_process(callback: CallbackQuery, product: Product):
     product_caption = get_product_caption(product)
     try:
-        photo = URLInputFile(photo_url)
+        photo = URLInputFile(product.url)
         media = InputMediaPhoto(media=photo, caption=product_caption)
         await callback.message.edit_media(media=media, reply_markup=catalog_kb)
     except TelegramNetworkError:
@@ -37,13 +36,12 @@ async def catalog_process(callback: CallbackQuery, product):
 
 
 @catalog_router.message(Command(commands='catalog'))
-async def process_catalog_command(message: Message, bot: Bot, request: Request):
+async def process_catalog_command(message: Message, bot: Bot, request: DBRequest):
     await request.update_page(page=1, user_id=message.from_user.id)
-    product = await request.get_product(0)
-    photo_url = product[3]
+    product: Product = await request.get_product(0)
     product_caption = get_product_caption(product)
     try:
-        photo = URLInputFile(photo_url)
+        photo = URLInputFile(product.url)
         await bot.send_photo(chat_id=message.chat.id, photo=photo, caption=product_caption, reply_markup=catalog_kb)
     except TelegramNetworkError:
         photo = URLInputFile(NO_PHOTO)
@@ -51,14 +49,14 @@ async def process_catalog_command(message: Message, bot: Bot, request: Request):
 
 
 @catalog_router.callback_query(Text(text=['back']))
-async def back_button_press(callback: CallbackQuery, request: Request):
+async def back_button_press(callback: CallbackQuery, request: DBRequest):
     await request.update_page(page=1, user_id=callback.from_user.id)
     await callback.message.delete()
     await callback.answer()
 
 
 @catalog_router.callback_query(Text(startswith=['right']))
-async def right_button_press(callback: CallbackQuery, request: Request):
+async def right_button_press(callback: CallbackQuery, request: DBRequest):
     page = await request.get_page(callback.from_user.id)
     catalog_length = await request.get_catalog_length()
     if page < catalog_length:
@@ -69,7 +67,7 @@ async def right_button_press(callback: CallbackQuery, request: Request):
 
 
 @catalog_router.callback_query(Text(text=['left']))
-async def left_button_press(callback: CallbackQuery, request: Request):
+async def left_button_press(callback: CallbackQuery, request: DBRequest):
     page = await request.get_page(callback.from_user.id)
     if page > 1:
         product = await request.get_product(page - 2)

@@ -1,7 +1,7 @@
 from tortoise import fields, Model
 
 
-class Catalog(Model):
+class Product(Model):
     name = fields.CharField(max_length=65, pk=True)
     price = fields.BigIntField()
     url = fields.CharField(max_length=120, null=True)
@@ -14,7 +14,7 @@ class Catalog(Model):
         return self.name
 
 
-class Users(Model):
+class User(Model):
     user_id = fields.BigIntField(unique=True, pk=True)
     is_admin = fields.BooleanField(default=False)
     is_private = fields.BooleanField(default=False)
@@ -25,3 +25,20 @@ class Users(Model):
 
     def __str__(self):
         return self.user_id
+
+
+class Quest(Model):
+    id = fields.BigIntField(pk=True)
+    from_user = fields.BigIntField()
+    telegram_id = fields.BigIntField()
+    test = fields.CharField(max_length=1000)
+    date = fields.CharField(max_length=100)
+    time = fields.CharField(max_length=100)
+    answer_time = fields.BigIntField()
+    scheduler_job_id = fields.CharField(max_length=1000)
+
+    class Meta:
+        table = "quests"
+
+    def __str__(self):
+        return self.test

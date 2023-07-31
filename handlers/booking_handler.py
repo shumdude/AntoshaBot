@@ -2,7 +2,7 @@ from aiogram import Router, Bot
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 from settings import LEXICON
-from database import Request
+from database import DBRequest
 
 from keyboards.booking_keyboard import GoodsCallbackFactory
 

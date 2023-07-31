@@ -12,12 +12,12 @@
         <td>Сайт</td>
         <td>Фото</td>
     </tr>
-{% for j in catalog %}
+{% for product in catalog %}
     <tr>
-        <td>{{j[0]}}</td>
-        <td>{{j[1]}}</td>
-        <td>{{j[2]}}</td>
-        <td>{{j[3]}}</td>
+        <td>{{product.name}}</td>
+        <td>{{product.price}}</td>
+        <td>{{product.url}}</td>
+        <td>{{product.photo}}</td>
     </tr>
 {% endfor %}
 </table>

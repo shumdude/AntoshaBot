@@ -1,3 +1,5 @@
+from database import Product
+
 LEXICON: dict[str, str] = {'cancel': 'Отменить',
                            '/start': 'Привет! Меня зовут Антон Павлович Чехов, но для своих - просто Антоша Чехонте.'
                                      '\n\nИспользуйте команду /commands для ознакомления с моими функциями.',
@@ -26,11 +28,8 @@ LEXICON: dict[str, str] = {'cancel': 'Отменить',
                            '/booking': 'Бронирование'}
 
 
-def get_product_caption(product: tuple) -> str:
-    name: str = product[0]
-    price: str = str(product[1])
-    site: str = product[2]
-    product_caption: str = f"Название: {name}\n\nЦена: {price}\n\nСайт: {site}"
+def get_product_caption(product: Product) -> str:
+    product_caption: str  = f"Название: {product.name}\n\nЦена: {product.price}\n\nСайт: {product.url}"
     return product_caption
 
 
