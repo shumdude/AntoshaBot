@@ -6,7 +6,9 @@ LEXICON: dict[str, str] = {'cancel': 'Отменить',
                            '/commands': 'Список команд:\n\n'
                                         '/catalog - просмотр каталога товаров\n\n'
                                         '/fsm - напоминание для сотрудника\n\n'
-                                        '/booking - бронирование мест (в процессе разработки)\n\n',
+                                        '/booking - бронирование мест (в процессе разработки)\n\n'
+                                        '/registration - зарегистрироваться в клубе\n'
+                                        '/info - посмотреть свою информацию\n\n',
                            'no_echo': 'TypeError with message.send_copy',
                            '/insert': 'Готово! Вставил данные в БД',
                            '/get': 'Лови',
@@ -25,11 +27,14 @@ LEXICON: dict[str, str] = {'cancel': 'Отменить',
                                    '(время в секундах для ответа сотрудником на ваше напоминание)\n\n'
                                    'Для прекращения заполения формы вопользуйтесь /cancel\n\n'
                                    'P.S.: Данная задача реализована так, как требовал того заказчик',
-                           '/booking': 'Бронирование'}
+                           '/booking': 'Бронирование \n\n(*) (В процессе разработки)',
+                           '/registration': 'Зарегистрируемся в клубе! '
+                                            '(Для отмены ввода формы используйте /cancel_registration) \n\n'
+                                            'Введите ваше имя:'}
 
 
 def get_product_caption(product: Product) -> str:
-    product_caption: str  = f"Название: {product.name}\n\nЦена: {product.price}\n\nСайт: {product.url}"
+    product_caption: str = f"Название: {product.name}\n\nЦена: {product.price}\n\nСайт: {product.url}"
     return product_caption
 
 

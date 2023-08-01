@@ -35,15 +35,19 @@ class DBRequest:
         # query = f"""INSERT INTO users (user_id) VALUES ({user_id}) ON CONFLICT (user_id) DO NOTHING """
         # conn = connections.get("default")
         # await conn.execute_query(query)
-        # await User.create(user_id=user_id)
-        user = User(user_id=user_id)
-        await user.save()
+        await User.update_or_create(user_id=user_id)
 
     async def update_page(self, page: int, user_id: int):
         return await User.filter(user_id=user_id).update(page=page)
 
     async def get_page(self, user_id: int):
         return await User.get_or_none(user_id=user_id).values_list("page", flat=True)
+
+    async def registration(self, user_id: int, name: str, date_of_birth: str, phone: str):
+        return await User.filter(user_id=user_id).update(name=name, date_of_birth=date_of_birth, phone=phone)
+
+    async def get_user(self, user_id: int):
+        return await User.get_or_none(user_id=user_id)
 
     """NOT DONE"""
     # query = """CREATE TABLE IF NOT EXISTS test_table (id serial PRIMARY KEY,name text NOT NULL)"""

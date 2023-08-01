@@ -19,6 +19,9 @@ class User(Model):
     is_admin = fields.BooleanField(default=False)
     is_private = fields.BooleanField(default=False)
     page = fields.IntField(default=1)
+    phone = fields.CharField(max_length=50, null=True)
+    date_of_birth = fields.DateField(null=True)
+    name = fields.CharField(max_length=100, null=True)
 
     class Meta:
         table = "users"
