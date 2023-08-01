@@ -48,7 +48,7 @@ async def start():
         'connections': {'default': config.db_url()},
         'apps': {
             'app': {
-                'models': ['database.models'],
+                'models': ['database.models', 'aerich.models'],
                 'default_connection': 'default'
             },
         },

@@ -1,3 +1,4 @@
+from config import Config, load_config
 from database import Product
 
 LEXICON: dict[str, str] = {'cancel': 'Отменить',
@@ -40,3 +41,14 @@ def get_product_caption(product: Product) -> str:
 
 # сделать телеграм фото и хранить в БД в отдельной служебной таблице
 NO_PHOTO = "https://topzero.com/wp-content/uploads/2020/06/topzero-products-Malmo-Matte-Black-TZ-PE458M-image-003.jpg"
+
+config: Config = load_config('.env')
+TORTOISE_ORM ={
+        'connections': {'default': config.db_url()},
+        'apps': {
+            'app': {
+                'models': ['database.models', 'aerich.models'],
+                'default_connection': 'default'
+            },
+        },
+    }
