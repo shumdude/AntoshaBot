@@ -2,12 +2,12 @@ import asyncio
 import logging
 from aiogram.fsm.storage.memory import MemoryStorage
 from tortoise import Tortoise
-from bot import handlers
+import handlers
 from aiogram import Bot, Dispatcher
-from bot.config import TORTOISE_ORM, config
+from config import TORTOISE_ORM, config
 from apscheduler.schedulers.asyncio import AsyncIOScheduler  # библиотека для уведомлений в телеграм
 from dateutil.tz import tzoffset  # библиотека для работы со временем
-from bot.middlewares import ApschedulerMiddleware
+from middlewares import ApschedulerMiddleware
 from aerich import Command
 
 
@@ -62,5 +62,5 @@ async def start():
 
 
 # Start telegram bot
-if __name__ == "__main__":
-    asyncio.run(start())
+# if __name__ == "__main__":
+#     asyncio.run(start())

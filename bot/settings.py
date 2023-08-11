@@ -1,4 +1,4 @@
-from bot.database import Product
+from database import Product
 
 # i18n как вариант
 LEXICON: dict[str, str] = {'cancel': 'Отменить',
