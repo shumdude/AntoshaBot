@@ -11,7 +11,7 @@ services:
       - "5432:5432"
   bot:
     build: .
-    command: sh -c "aerich upgrade && python -m main"
+    command: sh -c "aerich upgrade && python -m ./bot/main"
     env_file:
       - ./.env
     restart: always
