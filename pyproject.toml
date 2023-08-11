@@ -1,4 +1,4 @@
 [tool.aerich]
 tortoise_orm = "bot.config.TORTOISE_ORM"
 location = "bot/database/migrations"
-src_folder = "./."
+src_folder = "./bot"
