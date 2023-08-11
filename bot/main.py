@@ -40,7 +40,7 @@ async def start():
     logger.info("Migrations...")
     command = Command(tortoise_config=TORTOISE_ORM, location="bot/database/migrations", app='app')
     await command.init()
-    await command.init_db(safe=True)
+    # await command.init_db(safe=True)
     await command.migrate()
     await command.upgrade(run_in_transaction=True)
 
