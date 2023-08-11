@@ -12,7 +12,7 @@ from aerich import Command
 
 
 async def start():
-    # Logging
+    # Logging: Structlog как вариант
     logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.INFO,
                         format="%(asctime)s - [%(levelname)s] -  %(name)s - "
@@ -25,7 +25,7 @@ async def start():
     storage: MemoryStorage = MemoryStorage()  # Сменить на Redis
     dp: Dispatcher = Dispatcher(storage=storage)
 
-    # Обработчик уведомлений
+    # Обработчик уведомлений: taskiq как вариант
     logger.info("Scheduler...")
     scheduler = AsyncIOScheduler(timezone=tzoffset(None, 5.0 * 3600))
     scheduler.start()
@@ -39,7 +39,7 @@ async def start():
     await command.migrate()
     await command.upgrade(run_in_transaction=True)
 
-    # Tortoise-ORM
+    # Tortoise-ORM: SQLAlchemy как вариант
     logger.info("Tortoise...")
     await Tortoise.init(config=TORTOISE_ORM)
     await Tortoise.generate_schemas()

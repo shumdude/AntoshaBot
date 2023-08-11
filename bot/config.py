@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass  # adaptix как вариант
 from environs import Env
 
 
