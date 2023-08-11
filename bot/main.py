@@ -31,18 +31,18 @@ async def start():
     scheduler.start()
     dp.update.middleware.register(ApschedulerMiddleware(scheduler))
 
-    # Migrations
-    logger.info("Migrations...")
-    command = Command(tortoise_config=TORTOISE_ORM, location="bot/database/migrations/app", app='app')
-    await command.init()
-    await command.init_db(safe=True)
-    await command.migrate()
-    await command.upgrade(run_in_transaction=True)
-
     # Tortoise-ORM: SQLAlchemy как вариант
     logger.info("Tortoise...")
     await Tortoise.init(config=TORTOISE_ORM)
     await Tortoise.generate_schemas()
+
+    # Migrations
+    logger.info("Migrations...")
+    command = Command(tortoise_config=TORTOISE_ORM, location="bot/database/migrations/app", app='app')
+    await command.init()
+    # await command.init_db(safe=True)
+    await command.migrate()
+    await command.upgrade(run_in_transaction=True)
 
     # Вносим роутеры в диспетчер
     logger.info("Register handlers...")
