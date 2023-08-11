@@ -38,7 +38,7 @@ async def start():
 
     # Migrations
     logger.info("Migrations...")
-    command = Command(tortoise_config=TORTOISE_ORM, location="bot/database/migrations/app", app='app')
+    command = Command(tortoise_config=TORTOISE_ORM, location="bot/database/migrations", app='app')
     await command.init()
     # await command.init_db(safe=True)
     await command.migrate()

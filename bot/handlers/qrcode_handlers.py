@@ -2,7 +2,7 @@ from path import Path
 from bot.services import gen_qr_code
 from aiogram import Router, Bot
 from aiogram.filters import Command
-from aiogram.types import Message, InputFile, FSInputFile
+from aiogram.types import Message, FSInputFile
 
 qrcode_router: Router = Router()  # Инициализируем роутер уровня модуля
 

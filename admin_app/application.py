@@ -6,13 +6,12 @@ from fastapi.responses import HTMLResponse
 from fastapi.requests import Request
 from fastapi.templating import Jinja2Templates
 from tortoise.contrib.fastapi import register_tortoise
-
+from bot.database.db_requests import get_catalog
 from bot.config import Config, load_config
 from bot.main import create_pool
-from bot.database import DBRequest
 
 
-def create_app(db_request: DBRequest, connector: Pool):
+def create_app(connector: Pool):
     app = FastAPI(debug=True)
 
     templates = Jinja2Templates(directory="templates")
@@ -20,7 +19,7 @@ def create_app(db_request: DBRequest, connector: Pool):
     @app.get("/", response_class=HTMLResponse)
     async def read_root(request: Request):
         async with connector.acquire() as connect:
-            catalog = await db_request.get_catalog()
+            catalog = await get_catalog()
             return templates.TemplateResponse("item.html", {"request": request, "catalog": catalog})
 
     return app
