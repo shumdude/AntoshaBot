@@ -1,5 +1,4 @@
-from config import Config, load_config
-from database import Product
+from bot.database import Product
 
 LEXICON: dict[str, str] = {'cancel': 'Отменить',
                            '/start': 'Привет! Меня зовут Антон Павлович Чехов, но для своих - просто Антоша Чехонте.'
@@ -7,7 +6,7 @@ LEXICON: dict[str, str] = {'cancel': 'Отменить',
                            '/commands': 'Список команд:\n\n'
                                         '/catalog - просмотр каталога товаров\n\n'
                                         '/fsm - напоминание для сотрудника\n\n'
-                                        '/booking - бронирование мест (в процессе разработки)\n\n'
+                                        '*** - бронирование мест (в процессе разработки)\n\n'
                                         '/registration - зарегистрироваться в клубе\n'
                                         '/info - посмотреть свою информацию\n\n',
                            'no_echo': 'TypeError with message.send_copy',
@@ -41,14 +40,3 @@ def get_product_caption(product: Product) -> str:
 
 # сделать телеграм фото и хранить в БД в отдельной служебной таблице
 NO_PHOTO = "https://topzero.com/wp-content/uploads/2020/06/topzero-products-Malmo-Matte-Black-TZ-PE458M-image-003.jpg"
-
-config: Config = load_config('.env')
-TORTOISE_ORM ={
-        'connections': {'default': config.db_url()},
-        'apps': {
-            'app': {
-                'models': ['database.models', 'aerich.models'],
-                'default_connection': 'default'
-            },
-        },
-    }

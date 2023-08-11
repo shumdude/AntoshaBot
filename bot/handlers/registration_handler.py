@@ -4,18 +4,19 @@ from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import Message
-from database import DBRequest, User
-from filters import ContactFilter, DateFilter
-from keyboards import contact_kb, remove_kb
-from settings import LEXICON
-from states import FSMRegistration
+from bot.database import User
+from bot.database.db_requests import registration, get_user
+from bot.filters import ContactFilter, DateFilter
+from bot.keyboards import contact_kb, remove_kb
+from bot.settings import LEXICON
+from bot.states import FSMRegistration
 
 registration_router: Router = Router()  # Инициализируем роутер уровня модуля
 
 
 @registration_router.message(Command(commands='info'))
-async def process_cancel_command_state(message: Message, request: DBRequest):
-    user: User = await request.get_user(message.from_user.id)
+async def process_cancel_command_state(message: Message):
+    user: User = await get_user(message.from_user.id)
     text: str = f"Имя: {user.name}\n\nНомер: {user.phone}\n\nДата рождения: {user.date_of_birth}"
     await message.answer(text=text)
 
@@ -54,10 +55,10 @@ async def process_phone(message: Message, state: FSMContext):
 
 # Точка выхода - Дата рождения
 @registration_router.message(StateFilter(FSMRegistration.date_of_birth), DateFilter())
-async def process_date_of_birth(message: Message, state: FSMContext, request: DBRequest, date: datetime.date):
+async def process_date_of_birth(message: Message, state: FSMContext, date: datetime.date):
     await state.update_data(date_of_birth=date)
     data = await state.get_data()
-    await request.registration(user_id=message.from_user.id,
+    await registration(user_id=message.from_user.id,
                                date_of_birth=data["date_of_birth"],
                                name=data["name"],
                                phone=data["phone"])

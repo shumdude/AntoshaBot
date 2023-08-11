@@ -1,20 +1,21 @@
 from aiogram import Router, Bot
-from aiogram.filters import Command, CommandStart, Text
-from aiogram.types import Message, CallbackQuery, InputMediaPhoto, URLInputFile, InputMedia
+from aiogram.filters import Command, Text
+from aiogram.types import Message, CallbackQuery, InputMediaPhoto, URLInputFile
 from aiogram.exceptions import TelegramNetworkError, TelegramBadRequest
-from settings import NO_PHOTO
-from settings import LEXICON, get_product_caption
-from keyboards import catalog_kb
-from database import DBRequest, Product
+from bot.settings import NO_PHOTO
+from bot.settings import LEXICON, get_product_caption
+from bot.keyboards import catalog_kb
+from bot.database import Product
+from bot.database.db_requests import *
 
 catalog_router: Router = Router()  # Инициализируем роутер уровня модуля
 
 
 # Выгрузить из БД каталог товаров
 @catalog_router.message(Command(commands='get'))
-async def process_get_command(message: Message, request: DBRequest):
+async def process_get_command(message: Message):
     await message.answer(text=LEXICON['/get'])
-    catalog_list = await request.get_catalog()
+    catalog_list = await get_catalog()
     for product in catalog_list:
         text = f"{product.name}, {product.price}, {product.url}, {product.photo}"
         await message.answer(text=text)
@@ -36,9 +37,9 @@ async def catalog_process(callback: CallbackQuery, product: Product):
 
 
 @catalog_router.message(Command(commands='catalog'))
-async def process_catalog_command(message: Message, bot: Bot, request: DBRequest):
-    await request.update_page(page=1, user_id=message.from_user.id)
-    product: Product = await request.get_product(0)
+async def process_catalog_command(message: Message, bot: Bot):
+    await update_page(page=1, user_id=message.from_user.id)
+    product: Product = await get_product(0)
     product_caption = get_product_caption(product)
     try:
         photo = URLInputFile(product.url)
@@ -49,29 +50,29 @@ async def process_catalog_command(message: Message, bot: Bot, request: DBRequest
 
 
 @catalog_router.callback_query(Text(text=['back']))
-async def back_button_press(callback: CallbackQuery, request: DBRequest):
-    await request.update_page(page=1, user_id=callback.from_user.id)
+async def back_button_press(callback: CallbackQuery, ):
+    await update_page(page=1, user_id=callback.from_user.id)
     await callback.message.delete()
     await callback.answer()
 
 
 @catalog_router.callback_query(Text(startswith=['right']))
-async def right_button_press(callback: CallbackQuery, request: DBRequest):
-    page = await request.get_page(callback.from_user.id)
-    catalog_length = await request.get_catalog_length()
+async def right_button_press(callback: CallbackQuery):
+    page = await get_page(callback.from_user.id)
+    catalog_length = await get_catalog_length()
     if page < catalog_length:
-        product = await request.get_product(page)
-        await request.update_page(page=page + 1, user_id=callback.from_user.id)
+        product = await get_product(page)
+        await update_page(page=page + 1, user_id=callback.from_user.id)
         await catalog_process(callback, product)
     await callback.answer()
 
 
 @catalog_router.callback_query(Text(text=['left']))
-async def left_button_press(callback: CallbackQuery, request: DBRequest):
-    page = await request.get_page(callback.from_user.id)
+async def left_button_press(callback: CallbackQuery):
+    page = await get_page(callback.from_user.id)
     if page > 1:
-        product = await request.get_product(page - 2)
-        await request.update_page(page=page - 1, user_id=callback.from_user.id)
+        product = await get_product(page - 2)
+        await update_page(page=page - 1, user_id=callback.from_user.id)
         await catalog_process(callback, product)
     await callback.answer()
 

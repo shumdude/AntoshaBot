@@ -1,10 +1,9 @@
 from aiogram import Router, Bot
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
-from settings import LEXICON
-from database import DBRequest
+from bot.settings import LEXICON
 
-from keyboards.booking_keyboard import GoodsCallbackFactory
+from bot.keyboards.booking_keyboard import GoodsCallbackFactory
 
 booking_router: Router = Router()  # Инициализируем роутер уровня модуля
 

@@ -1,22 +1,14 @@
 import asyncio
 import logging
-import asyncpg
 from aiogram.fsm.storage.memory import MemoryStorage
 from tortoise import Tortoise
-import handlers
+from bot import handlers
 from aiogram import Bot, Dispatcher
-from config import Config, load_config
+from bot.config import TORTOISE_ORM, config
 from apscheduler.schedulers.asyncio import AsyncIOScheduler  # библиотека для уведомлений в телеграм
 from dateutil.tz import tzoffset  # библиотека для работы со временем
-from middlewares import ApschedulerMiddleware, DatabaseMiddleware
-
-
-# Function to create pool with database
-async def create_pool(config: Config) -> asyncpg.pool.Pool:
-    return await asyncpg.create_pool(user=config.db.db_user,
-                                     password=config.db.db_password,
-                                     host=config.db.db_host,
-                                     database=config.db.database)
+from bot.middlewares import ApschedulerMiddleware
+from aerich import Command
 
 
 async def start():
@@ -25,36 +17,32 @@ async def start():
     logging.basicConfig(level=logging.INFO,
                         format="%(asctime)s - [%(levelname)s] -  %(name)s - "
                                "(%(filename)s).%(funcName)s(%(lineno)d) - %(message)s")
-
     logger.info('Starting telegram bot')
 
-    # Config, Bot, Dispatcher
-    config: Config = load_config('.env')
+    # Bot, Storage, Dispatcher
+    logger.info("Bot, Storage, Dispatcher...")
     bot: Bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
-    storage: MemoryStorage = MemoryStorage()
+    storage: MemoryStorage = MemoryStorage()  # Сменить на Redis
     dp: Dispatcher = Dispatcher(storage=storage)
 
-    # DatabaseMiddleware
-    pool_connect = await create_pool(config)
-    dp.update.middleware.register(DatabaseMiddleware(pool_connect))
-
     # Обработчик уведомлений
+    logger.info("Scheduler...")
     scheduler = AsyncIOScheduler(timezone=tzoffset(None, 5.0 * 3600))
     scheduler.start()
     dp.update.middleware.register(ApschedulerMiddleware(scheduler))
 
+    # Migrations
+    logger.info("Migrations...")
+    command = Command(tortoise_config=TORTOISE_ORM, location="bot/database/migrations/app", app='app')
+    await command.init()
+    await command.init_db(safe=True)
+    await command.migrate()
+    await command.upgrade(run_in_transaction=True)
+
     # Tortoise-ORM
-    await Tortoise.init(config={
-        'connections': {'default': config.db_url()},
-        'apps': {
-            'app': {
-                'models': ['database.models', 'aerich.models'],
-                'default_connection': 'default'
-            },
-        },
-    })
+    logger.info("Tortoise...")
+    await Tortoise.init(config=TORTOISE_ORM)
     await Tortoise.generate_schemas()
-    logger.info("Tortoise inited!")
 
     # Вносим роутеры в диспетчер
     logger.info("Register handlers...")

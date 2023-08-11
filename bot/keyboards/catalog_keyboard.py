@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from settings import LEXICON
+from bot.settings import LEXICON
 
 # Catalog keyboard
 left_button: InlineKeyboardButton = InlineKeyboardButton(text=LEXICON['left'], callback_data='left')

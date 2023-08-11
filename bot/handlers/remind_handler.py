@@ -6,10 +6,10 @@ from aiogram.fsm.state import default_state
 from aiogram.types import CallbackQuery, Message
 from apscheduler.job import Job
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from database import DBRequest
-from settings import LEXICON
-from states import FSMRemind
-from keyboards import create_remind_kb
+from bot.database.db_requests import add_data, get_sender
+from bot.settings import LEXICON
+from bot.states import FSMRemind
+from bot.keyboards import create_remind_kb
 
 remind_router: Router = Router()  # Инициализируем роутер уровня модуля
 
@@ -63,7 +63,7 @@ async def process_time(message: Message, state: FSMContext):
 
 # Точка выхода - answer_time
 @remind_router.message(StateFilter(FSMRemind.answer_time))
-async def process_answer_time(message: Message, state: FSMContext, request: DBRequest, bot: Bot,
+async def process_answer_time(message: Message, state: FSMContext, bot: Bot,
                               scheduler: AsyncIOScheduler):
     await state.update_data(answer_time=message.text)
     data = await state.get_data()
@@ -77,7 +77,7 @@ async def process_answer_time(message: Message, state: FSMContext, request: DBRe
                                  run_date=datetime.now() + timedelta(seconds=int(data["answer_time"])),
                                  args=(message, bot))
     job_kb = await create_remind_kb(job.id)  # создаём клавиатуру для данного job
-    await request.add_data(message.from_user.id,
+    await add_data(message.from_user.id,
                            int(data["telegram_id"]),
                            data["test"],
                            data["date"],
@@ -97,28 +97,28 @@ async def if_ignore(message: Message, bot: Bot):
 
 # Выполнено
 @remind_router.callback_query(Text(startswith=['y_']))
-async def process_done_press(callback: CallbackQuery, scheduler: AsyncIOScheduler, request: DBRequest, bot: Bot):
-    await process_remind_press(callback, scheduler, request, bot,
+async def process_done_press(callback: CallbackQuery, scheduler: AsyncIOScheduler, bot: Bot):
+    await process_remind_press(callback, scheduler, bot,
                                "Выполнено",
                                "Приняли твой ответ!\n\nМолодец что выполнил")
 
 
 # Не сделано
 @remind_router.callback_query(Text(startswith=['n_']))
-async def process_not_done_press(callback: CallbackQuery, scheduler: AsyncIOScheduler, request: DBRequest, bot: Bot):
-    await process_remind_press(callback, scheduler, request, bot,
+async def process_not_done_press(callback: CallbackQuery, scheduler: AsyncIOScheduler, bot: Bot):
+    await process_remind_press(callback, scheduler, bot,
                                "Не сделано",
                                "Приняли твой ответ.\n\nПлохо что не сделал")
 
 
 # Нажата кнопка клавиатуры job
-async def process_remind_press(callback: CallbackQuery, scheduler: AsyncIOScheduler, request: DBRequest, bot: Bot,
+async def process_remind_press(callback: CallbackQuery, scheduler: AsyncIOScheduler, bot: Bot,
                                text_button: str,
                                text_for_user: str):
     job_id: str = callback.data.split("_")[-1]
     job: Job = scheduler.get_job(job_id=job_id)
     job.remove()
-    sender_id = await request.get_sender(job_id)
+    sender_id = await get_sender(job_id)
     await bot.send_message(chat_id=sender_id,
                            text=f"Пользователь @{callback.from_user.username} с ID {callback.from_user.id} "
                                 f"нажал кнопку \"{text_button}\"")
