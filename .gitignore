@@ -1,4 +1,4 @@
 .env
 .env.app
 pyproject.toml
-bot/database/migrations/*.o
+bot/database/migrations/
