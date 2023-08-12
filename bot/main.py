@@ -34,9 +34,13 @@ async def start():
     # Migrations
     logger.info("Migrations...")
     command = Command(tortoise_config=TORTOISE_ORM, location="bot/database/migrations", app='app')
+    logger.info("Init...")
     await command.init()
+    logger.info("Init DB...")
     await command.init_db(safe=True)
+    logger.info("Migrate...")
     await command.migrate()
+    logger.info("Upgrade...")
     await command.upgrade(run_in_transaction=True)
 
     # Tortoise-ORM: SQLAlchemy как вариант
