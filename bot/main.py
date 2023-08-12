@@ -2,12 +2,12 @@ import asyncio
 import logging
 from aiogram.fsm.storage.memory import MemoryStorage
 from tortoise import Tortoise
-import handlers
+from bot import handlers
 from aiogram import Bot, Dispatcher
-from config import TORTOISE_ORM, config
+from bot.config import TORTOISE_ORM, config
 from apscheduler.schedulers.asyncio import AsyncIOScheduler  # библиотека для уведомлений в телеграм
 from dateutil.tz import tzoffset  # библиотека для работы со временем
-from middlewares import ApschedulerMiddleware
+from bot.middlewares import ApschedulerMiddleware
 from aerich import Command
 
 
@@ -31,18 +31,18 @@ async def start():
     scheduler.start()
     dp.update.middleware.register(ApschedulerMiddleware(scheduler))
 
-    # Tortoise-ORM: SQLAlchemy как вариант
-    logger.info("Tortoise...")
-    await Tortoise.init(config=TORTOISE_ORM)
-    await Tortoise.generate_schemas()
-
     # Migrations
     logger.info("Migrations...")
     command = Command(tortoise_config=TORTOISE_ORM, location="bot/database/migrations", app='app')
     await command.init()
-    # await command.init_db(safe=True)
+    await command.init_db(safe=True)
     await command.migrate()
     await command.upgrade(run_in_transaction=True)
+
+    # Tortoise-ORM: SQLAlchemy как вариант
+    logger.info("Tortoise...")
+    # await Tortoise.init(config=TORTOISE_ORM)
+    await Tortoise.generate_schemas()
 
     # Вносим роутеры в диспетчер
     logger.info("Register handlers...")
@@ -62,5 +62,5 @@ async def start():
 
 
 # Start telegram bot
-# if __name__ == "__main__":
-#     asyncio.run(start())
+if __name__ == "__main__":
+    asyncio.run(start())
