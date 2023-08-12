@@ -44,8 +44,9 @@ async def start():
     await command.upgrade(run_in_transaction=True)
 
     # Tortoise-ORM: SQLAlchemy как вариант
-    logger.info("Tortoise...")
-    # await Tortoise.init(config=TORTOISE_ORM)
+    logger.info("Tortoise init...")
+    await Tortoise.init(config=TORTOISE_ORM)
+    logger.info("Tortoise generate schemas...")
     await Tortoise.generate_schemas()
 
     # Вносим роутеры в диспетчер
