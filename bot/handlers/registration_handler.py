@@ -59,8 +59,8 @@ async def process_date_of_birth(message: Message, state: FSMContext, date: datet
     await state.update_data(date_of_birth=date)
     data = await state.get_data()
     await registration(user_id=message.from_user.id,
-                               date_of_birth=data["date_of_birth"],
-                               name=data["name"],
-                               phone=data["phone"])
+                       date_of_birth=data["date_of_birth"],
+                       name=data["name"],
+                       phone=data["phone"])
     await state.clear()
     await message.answer(text="Вы зарегистрированы! Ура!\n\nДля просмотра вашего аккаунта используйте /info")
