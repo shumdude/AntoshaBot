@@ -57,6 +57,7 @@ async def start():
     dp.include_router(handlers.booking_router)
     dp.include_router(handlers.registration_router)
     dp.include_router(handlers.qrcode_router)
+    dp.include_router(handlers.web_app_router)
 
     # Start polling
     try:
