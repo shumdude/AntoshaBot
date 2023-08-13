@@ -5,8 +5,8 @@ from tortoise import Tortoise
 from bot import handlers
 from aiogram import Bot, Dispatcher
 from bot.config import TORTOISE_ORM, config
-from apscheduler.schedulers.asyncio import AsyncIOScheduler  # библиотека для уведомлений в телеграм
-from dateutil.tz import tzoffset  # библиотека для работы со временем
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from dateutil.tz import tzoffset
 from bot.middlewares import ApschedulerMiddleware
 from aerich import Command
 
@@ -37,11 +37,11 @@ async def start():
     logger.info("Tortoise generate schemas...")
     await Tortoise.generate_schemas()
 
-    # Migrations
+    # Migrations: alembic как вариант
     logger.info("Migrations...")
-    command = Command(tortoise_config=TORTOISE_ORM, location="bot/database/migrations", app='app')  # копать здесь
+    command = Command(tortoise_config=TORTOISE_ORM, location="bot/database/migrations", app='app')
     logger.info("Init...")
-    await command.init()  # здесь начинается ошибка (в докере)
+    await command.init()
     # logger.info("Init DB...")
     # await command.init_db(safe=True)
     logger.info("Migrate...")
