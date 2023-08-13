@@ -31,23 +31,23 @@ async def start():
     scheduler.start()
     dp.update.middleware.register(ApschedulerMiddleware(scheduler))
 
-    # Migrations
-    logger.info("Migrations...")
-    command = Command(tortoise_config=TORTOISE_ORM, location="bot/database/migrations", app='app')
-    logger.info("Init...")
-    await command.init()
-    logger.info("Init DB...")
-    await command.init_db(safe=True)
-    logger.info("Migrate...")
-    await command.migrate()
-    logger.info("Upgrade...")
-    await command.upgrade(run_in_transaction=True)
-
     # Tortoise-ORM: SQLAlchemy как вариант
     logger.info("Tortoise init...")
     await Tortoise.init(config=TORTOISE_ORM)
     logger.info("Tortoise generate schemas...")
     await Tortoise.generate_schemas()
+
+    # Migrations
+    logger.info("Migrations...")
+    command = Command(tortoise_config=TORTOISE_ORM, location="bot/database/migrations", app='app')  # копать здесь
+    logger.info("Init...")
+    await command.init()  # здесь начинается ошибка (в докере)
+    # logger.info("Init DB...")
+    # await command.init_db(safe=True)
+    logger.info("Migrate...")
+    await command.migrate()
+    logger.info("Upgrade...")
+    await command.upgrade(run_in_transaction=True)
 
     # Вносим роутеры в диспетчер
     logger.info("Register handlers...")
