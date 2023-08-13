@@ -15,6 +15,18 @@ services:
       timeout: 5s
       retries: 10
 
+  pgadmin:
+    image: dpage/pgadmin4:7.5
+    restart: always
+    env_file:
+      - ./.env
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    links:
+      - "db:pgsql-server"
+
   bot:
     build: .
     command: sh -c "python -m run"
@@ -27,3 +39,4 @@ services:
 
 volumes:
   pgdata:
+  pgadmin-data:
