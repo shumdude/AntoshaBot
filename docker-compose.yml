@@ -15,15 +15,6 @@ services:
       timeout: 5s
       retries: 10
 
-#  migrations:
-#    build: bot
-#    command: sh -c "aerich upgrade"
-#    env_file:
-#      - ./.env
-#    depends_on:
-#       db:
-#          condition: service_healthy
-
   bot:
     build: .
     command: sh -c "python -m run"
@@ -31,11 +22,8 @@ services:
       - ./.env
     restart: always
     depends_on:
-#      migrations:
-#        condition: service_started
       db:
         condition: service_healthy
-#    depends_on:
-#      - db
+
 volumes:
   pgdata:
