@@ -4,6 +4,9 @@ import qrcode
 from PIL import Image, ImageDraw
 from pyzbar.pyzbar import decode
 from path import Path
+from qrcode.image.styledpil import StyledPilImage
+from qrcode.image.styles.moduledrawers.pil import RoundedModuleDrawer
+from qrcode.image.styles.colormasks import RadialGradiantColorMask, ImageColorMask
 
 
 # Путь до картинки с QR кодом
@@ -126,3 +129,12 @@ def gen_qr_code(text: str, path_to_download: Path, path_to_save: Path = None) ->
         path_to_download = path_to_save
     background.save(path_to_download)
     return True
+
+
+def generate_qr_code(text: str, path_to_download: Path, path_to_save: Path = None):
+    qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_L)
+    qr.add_data(text)
+    img_6 = qr.make_image(image_factory=StyledPilImage,
+                          color_mask=ImageColorMask(color_mask_path=path_to_download),
+                          module_drawer=RoundedModuleDrawer())
+    img_6.save(path_to_save)
