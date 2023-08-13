@@ -131,7 +131,7 @@ def gen_qr_code(text: str, path_to_download: Path, path_to_save: Path = None) ->
     return True
 
 
-def generate_qr_code(text: str, path_to_download: Path, path_to_save: Path = None):
+def generate_qr_code(text: str, path_to_download: str, path_to_save: str = None):
     qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_L)
     qr.add_data(text)
     img_6 = qr.make_image(image_factory=StyledPilImage,
