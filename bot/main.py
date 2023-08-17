@@ -1,15 +1,15 @@
 import asyncio
 import logging
+from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from fluent_compiler.bundle import FluentBundle
 from fluentogram import TranslatorHub, FluentTranslator
-from tortoise import Tortoise
 from bot import handlers
-from aiogram import Bot, Dispatcher
 from bot.config import TORTOISE_ORM, config
+from bot.middlewares import ApschedulerMiddleware, TranslatorRunnerMiddleware
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from dateutil.tz import tzoffset
-from bot.middlewares import ApschedulerMiddleware, TranslatorRunnerMiddleware
+from tortoise import Tortoise
 from aerich import Command
 
 
@@ -47,7 +47,6 @@ async def start():
     dp.callback_query.middleware.register(TranslatorRunnerMiddleware())
     dp.message.middleware.register(TranslatorRunnerMiddleware())
 
-
     # Tortoise-ORM: SQLAlchemy как вариант
     logger.info("Tortoise init...")
     await Tortoise.init(config=TORTOISE_ORM)
@@ -74,7 +73,7 @@ async def start():
     dp.include_router(handlers.booking_router)
     dp.include_router(handlers.registration_router)
     dp.include_router(handlers.qrcode_router)
-    dp.include_router(handlers.web_app_router)
+    # dp.include_router(handlers.web_app_router)
 
     # Start polling
     try:
