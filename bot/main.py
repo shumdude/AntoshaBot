@@ -34,17 +34,19 @@ async def start():
     dp.update.middleware.register(ApschedulerMiddleware(scheduler))
 
     # Fluentogram
-    dp.message.middleware.register(TranslatorRunnerMiddleware())
+    logger.info("Fluentogram...")
     translator_hub = TranslatorHub(
         {
             "ru": ("ru", "en"),
             "en": ("en",)
         },
         [
-            FluentTranslator("en", translator=FluentBundle.from_string("en-US", "start-hello = Hello, { $username }")),
-            FluentTranslator("ru", translator=FluentBundle.from_string("ru", "start-hello = Привет, { $username }"))
-        ],
-    )
+            FluentTranslator("ru", translator=FluentBundle.from_files("ru", ["bot/locales/ru.ftl"])),
+            FluentTranslator("en", translator=FluentBundle.from_files("en-US", ["bot/locales/en.ftl"]))
+        ])
+    dp.callback_query.middleware.register(TranslatorRunnerMiddleware())
+    dp.message.middleware.register(TranslatorRunnerMiddleware())
+
 
     # Tortoise-ORM: SQLAlchemy как вариант
     logger.info("Tortoise init...")

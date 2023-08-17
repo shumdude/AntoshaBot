@@ -2,8 +2,9 @@ from aiogram import Router, Bot
 from aiogram.filters import Command, Text
 from aiogram.types import Message, CallbackQuery, InputMediaPhoto, URLInputFile
 from aiogram.exceptions import TelegramNetworkError, TelegramBadRequest
+from fluentogram import TranslatorRunner
 from bot.settings import NO_PHOTO
-from bot.settings import LEXICON, get_product_caption
+from bot.settings import get_product_caption
 from bot.keyboards import catalog_kb
 from bot.database import Product
 from bot.database.db_requests import *
@@ -13,8 +14,7 @@ catalog_router: Router = Router()  # Инициализируем роутер �
 
 # Выгрузить из БД каталог товаров
 @catalog_router.message(Command(commands='get'))
-async def process_get_command(message: Message):
-    await message.answer(text=LEXICON['/get'])
+async def process_get_command(message: Message, i18n: TranslatorRunner):
     catalog_list = await get_catalog()
     for product in catalog_list:
         text = f"{product.name}, {product.price}, {product.url}, {product.photo}"
