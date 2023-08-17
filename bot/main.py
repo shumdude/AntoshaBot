@@ -1,13 +1,15 @@
 import asyncio
 import logging
 from aiogram.fsm.storage.memory import MemoryStorage
+from fluent_compiler.bundle import FluentBundle
+from fluentogram import TranslatorHub, FluentTranslator
 from tortoise import Tortoise
 from bot import handlers
 from aiogram import Bot, Dispatcher
 from bot.config import TORTOISE_ORM, config
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from dateutil.tz import tzoffset
-from bot.middlewares import ApschedulerMiddleware
+from bot.middlewares import ApschedulerMiddleware, TranslatorRunnerMiddleware
 from aerich import Command
 
 
@@ -30,6 +32,19 @@ async def start():
     scheduler = AsyncIOScheduler(timezone=tzoffset(None, 5.0 * 3600))
     scheduler.start()
     dp.update.middleware.register(ApschedulerMiddleware(scheduler))
+
+    # Fluentogram
+    dp.message.middleware.register(TranslatorRunnerMiddleware())
+    translator_hub = TranslatorHub(
+        {
+            "ru": ("ru", "en"),
+            "en": ("en",)
+        },
+        [
+            FluentTranslator("en", translator=FluentBundle.from_string("en-US", "start-hello = Hello, { $username }")),
+            FluentTranslator("ru", translator=FluentBundle.from_string("ru", "start-hello = Привет, { $username }"))
+        ],
+    )
 
     # Tortoise-ORM: SQLAlchemy как вариант
     logger.info("Tortoise init...")
@@ -62,7 +77,7 @@ async def start():
     # Start polling
     try:
         await bot.delete_webhook(True)
-        await dp.start_polling(bot)
+        await dp.start_polling(bot, _translator_hub=translator_hub)
     finally:
         await bot.session.close()
 

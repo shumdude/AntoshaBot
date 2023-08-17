@@ -1,1 +1,2 @@
 from .apscheduler_middleware import ApschedulerMiddleware
+from .translator_middleware import TranslatorRunnerMiddleware
