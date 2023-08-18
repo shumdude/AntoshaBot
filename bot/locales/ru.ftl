@@ -8,6 +8,7 @@ commands-list = Список команд:
                 /remind - напоминание для сотрудника
                 /registration - зарегистрироваться в клубе
                 /profile - посмотреть свою информацию
+                /qrcode - получить свой qrcode
 
 profile = Имя: { $username }
           Номер: { $phone }

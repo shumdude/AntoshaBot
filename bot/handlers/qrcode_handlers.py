@@ -14,7 +14,7 @@ async def process_commands_command(message: Message, bot: Bot):
            f"{message.from_user.id}"
     profile_photos = await message.from_user.get_profile_photos()
     file: File = await bot.get_file(file_id=profile_photos.photos[0][0].file_id)
-    await bot.download_file(file_path=file.file_path, destination="bot/services/example.jpg")
+    await bot.download_file(file_path=file.file_path, destination=f"bot/services/example_{message.from_user.id}.jpg")
     path_to_download = Path().joinpath("bot/services", "example.jpg")
     path_to_save = Path().joinpath("bot/services", "example.png")
     generate_qr_code(text, path_to_download, path_to_save)
